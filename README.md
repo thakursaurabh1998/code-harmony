@@ -5,6 +5,13 @@ Make your code more readable by making the functions work in harmony with each o
 - Proivdes an interface to write code in a more granular format.
 - Allows the sharing of resources between various worker functions to reduce duplicate data fetching or generating.
 
+## Install
+
+```bash
+npm install code-harmony
+```
+
+## Usage
 ```js
 // this is an example of a context creating function
 // can be any asynchronous call which
