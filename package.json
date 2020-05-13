@@ -1,0 +1,27 @@
+{
+  "name": "code-harmony",
+  "version": "1.0.0",
+  "description": "Make your code more readable by making the function calls and usage more verbose",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thakursaurabh1998/code-harmony.git"
+  },
+  "keywords": [
+    "organize",
+    "asynchronous",
+    "series",
+    "callback",
+    "context",
+    "promise"
+  ],
+  "author": "Saurabh Thakur <mail@saurabhthakur.dev>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thakursaurabh1998/code-harmony/issues"
+  },
+  "homepage": "https://github.com/thakursaurabh1998/code-harmony#readme"
+}
