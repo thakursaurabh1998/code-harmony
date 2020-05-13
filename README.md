@@ -3,7 +3,35 @@
 Make your code more readable by making the functions work in harmony with each other.
 
 - Proivdes an interface to write code in a more granular format.
-- Allows the sharing of resources between various functions to reduce duplicate data fetching or generating.
+- Allows the sharing of resources between various worker functions to reduce duplicate data fetching or generating.
+
+```js
+// this is an example of a context creating function
+// can be any asynchronous call which
+// resolves with an object containing data
+// the data is then populated in the context object
+// which is available to the worker functions
+function fetchUserData(subscribedData) {
+  const user = await fetchUserFromDB();
+  return Promise.resolve({ userId: user.id });
+}
+
+// this is an example of a worker function
+function applyOfferA(subscribedData, context) {
+  console.log(context) // -> { userId: 1234 }
+  return Promise.resolve();
+}
+
+const CodeHarmony = require('code-harmony');
+
+new CodeHarmony(subscribedData)
+  .context(fetchUserData)
+  .serially(applyOfferA, applyOfferB)
+  .parallelly(emailInvoice, smsInvoice)
+  .finish()
+  .then((d) => console.log('final data', d))
+  .catch((d) => console.log('caught', d));
+```
 
 ## Resources
 
