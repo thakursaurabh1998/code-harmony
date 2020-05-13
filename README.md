@@ -29,8 +29,8 @@ new CodeHarmony(subscribedData)
   .serially(applyOfferA, applyOfferB)
   .parallelly(emailInvoice, smsInvoice)
   .finish()
-  .then((d) => console.log('final data', d))
-  .catch((d) => console.log('caught', d));
+  .then() // resolves when all the tasks finishes
+  .catch(logger.error); // action can be taken on any error here
 ```
 
 ## Resources
