@@ -1,12 +1,69 @@
+function _registerSerialFunctions(functionsArray) {
+  this._properties.serialAsyncFuncs.push(...functionsArray);
+}
+
+function _registerParallelFunctions(functionsArray) {
+  this._properties.parallelAsyncFuncs.push(...functionsArray);
+}
+
+function _registerContextFunctions(functionsArray) {
+  this._properties.contextAsyncFuncs.push(...functionsArray);
+}
+
+function _runContextFunctions() {
+  const { contextAsyncFuncs, ingressData } = this._properties;
+  this._properties.contextPromise = Promise.all(
+    contextAsyncFuncs.map((asyncFnc) => asyncFnc(ingressData))
+  ).then((resp) => {
+    this._properties.contextData = resp.reduce(
+      (data, iter) => Object.assign(iter, data),
+      {}
+    );
+  });
+}
+
+function _runSerialFunctions() {
+  const { serialAsyncFuncs, ingressData, contextData } = this._properties;
+  this._properties.serialPromise = (async () => {
+    const toReturn = [];
+    for (let asyncFnc of serialAsyncFuncs) {
+      toReturn.push(await asyncFnc(ingressData, contextData));
+    }
+    return toReturn;
+  })();
+}
+
+function _runParallelFunctions() {
+  const { parallelAsyncFuncs, ingressData, contextData } = this._properties;
+  this._properties.parallelPromise = Promise.all(
+    parallelAsyncFuncs.map((asyncFnc) => asyncFnc(ingressData, contextData))
+  );
+}
+
+function _contextChecks() {
+  if (!this._properties.contextPromise) {
+    _runContextFunctions.call(this);
+  }
+}
+
 class CodeHarmony {
   /**
    *
    * @param {any} data Any kind of ingress data, either by any event or passed deliberately
    */
   constructor(data) {
-    this.ingressData = data;
-    this.contextData = null;
-    this.contextPromise = Promise.resolve();
+    this._properties = {
+      contextData: null,
+      ingressData: data,
+
+      contextPromise: null,
+      parallelPromise: null,
+      serialPromise: null,
+
+      contextAsyncFuncs: [],
+      serialAsyncFuncs: [],
+      parallelAsyncFuncs: [],
+    };
   }
 
   /**
@@ -19,14 +76,7 @@ class CodeHarmony {
    * @returns {this}
    */
   context(...asyncFncs) {
-    this.contextPromise = Promise.all(
-      asyncFncs.map((asyncFnc) => asyncFnc(this.ingressData))
-    ).then((resp) => {
-      this.contextData = resp.reduce(
-        (data, iter) => Object.assign(iter, data),
-        {}
-      );
-    });
+    _registerContextFunctions.call(this, asyncFncs);
     return this;
   }
 
@@ -39,13 +89,7 @@ class CodeHarmony {
    * @returns {this}
    */
   serially(...asyncFncs) {
-    this.seriesPromise = this.contextPromise.then(async () => {
-      const toReturn = [];
-      for (let asyncFnc of asyncFncs) {
-        toReturn.push(await asyncFnc(this.ingressData, this.contextData));
-      }
-      return toReturn;
-    });
+    _registerSerialFunctions.call(this, asyncFncs);
     return this;
   }
 
@@ -58,13 +102,7 @@ class CodeHarmony {
    * @returns {this}
    */
   parallelly(...asyncFncs) {
-    this.parallelPromise = this.contextPromise.then(() => {
-      return Promise.all(
-        asyncFncs.map((asyncFnc) =>
-          asyncFnc(this.ingressData, this.contextData)
-        )
-      );
-    });
+    _registerParallelFunctions.call(this, asyncFncs);
     return this;
   }
 
@@ -72,19 +110,31 @@ class CodeHarmony {
    * Marks the finishing of the chain, returns
    * a promise which resolves when all the provided
    * functions resolve in `serially` or `parallelly`
-   * @param {function(Error, object):any} [cb] optional if callback support required
+   * @param {function(Error, object):any} [callback] optional if callback support required
    * @returns {Promise}
    */
-  finish(cb) {
-    const dependencies = Promise.all([
-      this.parallelPromise,
-      this.seriesPromise,
+  async finish(callback) {
+    _contextChecks.call(this);
+    await this._properties.contextPromise;
+
+    _runSerialFunctions.call(this);
+    _runParallelFunctions.call(this);
+
+    const tasks = Promise.all([
+      this._properties.parallelPromise,
+      this._properties.serialPromise,
     ]);
 
-    if (!cb) {
-      return dependencies;
+    if (!callback) {
+      return tasks;
     }
-    return dependencies.then((data) => cb(null, data)).catch(cb);
+
+    try {
+      const toReturn = await tasks;
+      callback(null, toReturn);
+    } catch (error) {
+      callback(error, null);
+    }
   }
 }
 
