@@ -129,12 +129,7 @@ class CodeHarmony {
       return tasks;
     }
 
-    try {
-      const toReturn = await tasks;
-      callback(null, toReturn);
-    } catch (error) {
-      callback(error, null);
-    }
+    return tasks.then((toReturn) => callback(null, toReturn)).catch(callback);
   }
 }
 
