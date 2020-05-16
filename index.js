@@ -114,22 +114,29 @@ class CodeHarmony {
    * @returns {Promise}
    */
   async finish(callback) {
-    _contextChecks.call(this);
-    await this._properties.contextPromise;
+    try {
+      _contextChecks.call(this);
+      await this._properties.contextPromise;
 
-    _runSerialFunctions.call(this);
-    _runParallelFunctions.call(this);
+      _runSerialFunctions.call(this);
+      _runParallelFunctions.call(this);
 
-    const tasks = Promise.all([
-      this._properties.parallelPromise,
-      this._properties.serialPromise,
-    ]);
+      const tasks = Promise.all([
+        this._properties.parallelPromise,
+        this._properties.serialPromise,
+      ]);
 
-    if (!callback) {
-      return tasks;
+      if (!callback) {
+        return tasks;
+      }
+
+      return callback(null, await tasks);
+    } catch (error) {
+      if (!callback) {
+        return Promise.reject(error);
+      }
+      return callback(error, null);
     }
-
-    return tasks.then((toReturn) => callback(null, toReturn)).catch(callback);
   }
 }
 
