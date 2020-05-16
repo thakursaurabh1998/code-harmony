@@ -73,7 +73,7 @@ class CodeHarmony {
    * functions (available as a second parameter, check `serially`
    * and `parallelly` function params signature)
    * @param  {...function(any):Promise} asyncFncs N number of asynchronous functions that return a Promise
-   * @returns {this}
+   * @returns {this} this
    */
   context(...asyncFncs) {
     _registerContextFunctions.call(this, asyncFncs);
@@ -86,7 +86,7 @@ class CodeHarmony {
    *   1. The ingress data which was passed during instantiation
    *   2. Context object (optional)
    * @param  {...function(any, [Object]):Promise} asyncFncs N number of asynchronous functions that return a Promise
-   * @returns {this}
+   * @returns {this} this
    */
   serially(...asyncFncs) {
     _registerSerialFunctions.call(this, asyncFncs);
@@ -99,7 +99,7 @@ class CodeHarmony {
    *   1. The ingress data which was passed during instantiation
    *   2. Context object (optional)
    * @param  {...function(any, [Object]):Promise} asyncFncs N number of asynchronous functions that return a Promise
-   * @returns {this}
+   * @returns {this} this
    */
   parallelly(...asyncFncs) {
     _registerParallelFunctions.call(this, asyncFncs);
@@ -111,7 +111,7 @@ class CodeHarmony {
    * a promise which resolves when all the provided
    * functions resolve in `serially` or `parallelly`
    * @param {function(Error, object):any} [callback] optional if callback support required
-   * @returns {Promise}
+   * @returns {Promise} Promise
    */
   async finish(callback) {
     try {
