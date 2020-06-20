@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/thakursaurabh1998/code-harmony/issues"
   },
-  "homepage": "https://github.com/thakursaurabh1998/code-harmony#readme"
+  "homepage": "https://github.com/thakursaurabh1998/code-harmony#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }
