@@ -2,8 +2,12 @@
   "name": "code-harmony",
   "version": "1.1.1",
   "description": "Make your code more readable by making the function calls and usage more verbose",
-  "main": "index.js",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
   "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,5 +30,8 @@
   "homepage": "https://github.com/thakursaurabh1998/code-harmony#readme",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.3"
   }
 }
