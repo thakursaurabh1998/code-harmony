@@ -1,6 +1,6 @@
 {
   "name": "code-harmony",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Make your code more readable by making the function calls and usage more verbose",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
